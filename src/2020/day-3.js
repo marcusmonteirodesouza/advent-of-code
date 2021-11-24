@@ -13,18 +13,18 @@ async function readGrid() {
     .map((line) => line.split(''));
 }
 
-async function partOne() {
-  const grid = await readGrid();
+function numberOfTrees(grid, xSlope, ySlope) {
   const gridLength = grid[0].length;
   const gridHeight = grid.length;
 
   function goDown(x, y) {
-    return [(x + 3) % gridLength, y + 1];
+    return [(x + xSlope) % gridLength, y + ySlope];
   }
 
   const tree = '#';
   let treeCount = 0;
-  let [x, y] = [3, 1];
+  let [x, y] = [xSlope, ySlope];
+
   while (y < gridHeight) {
     if (grid[y][x] === tree) {
       treeCount += 1;
@@ -34,4 +34,24 @@ async function partOne() {
   return treeCount;
 }
 
-module.exports = { partOne };
+async function partOne() {
+  const grid = await readGrid();
+  return numberOfTrees(grid, 3, 1);
+}
+
+async function partTwo() {
+  const grid = await readGrid();
+
+  const slopes = [
+    [1, 1],
+    [3, 1],
+    [5, 1],
+    [7, 1],
+    [1, 2],
+  ];
+  return slopes
+    .map(([xSlope, ySlope]) => numberOfTrees(grid, xSlope, ySlope))
+    .reduce((a, b) => a * b);
+}
+
+module.exports = { partOne, partTwo };

@@ -6,4 +6,10 @@ describe('day-3', () => {
       await expect(day3.partOne()).resolves.toBe(169);
     });
   });
+
+  describe('partTwo', () => {
+    it('should return the correct result', async () => {
+      await expect(day3.partTwo()).resolves.toBe(7560370818);
+    });
+  });
 });
