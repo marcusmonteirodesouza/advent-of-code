@@ -1,34 +1,48 @@
-const assert = require('assert');
 const fs = require('fs');
 const path = require('path');
 
-async function solution() {
+async function readExpenses() {
   const input = await fs.promises.readFile(
     path.join(__dirname, 'inputs', 'day-1.txt'),
     'utf8'
   );
-  const expenses = input
+
+  return input
     .trim()
     .split('\n')
     .map((line) => Number.parseInt(line));
-  const entriesThatSumTo2020 = [];
+}
+
+async function partOne() {
+  const expenses = await readExpenses();
   const twoThousandTwentyMinusExpensesMap = new Map();
   for (const expense of expenses) {
     twoThousandTwentyMinusExpensesMap.set(2020 - expense, expense);
   }
   for (const expense of expenses) {
     if (twoThousandTwentyMinusExpensesMap.has(expense)) {
-      entriesThatSumTo2020.push(expense);
-      entriesThatSumTo2020.push(twoThousandTwentyMinusExpensesMap.get(expense));
-      break;
+      return expense * twoThousandTwentyMinusExpensesMap.get(expense);
     }
   }
-  assert.equal(
-    entriesThatSumTo2020.length,
-    2,
-    'Exactly two entries should sum to 2020'
-  );
-  return entriesThatSumTo2020.reduce((a, b) => a * b);
 }
 
-module.exports = { solution };
+async function partTwo() {
+  const expenses = await readExpenses();
+  expenses.sort();
+  for (let i = 1; i < expenses.length - 1; i++) {
+    let l = i - 1;
+    let r = i + 1;
+    while (l >= 0 && r < expenses.length) {
+      const sum = expenses[l] + expenses[i] + expenses[r];
+      if (sum > 2020) {
+        l -= 1;
+      } else if (sum < 2020) {
+        r += 1;
+      } else {
+        return expenses[l] * expenses[i] * expenses[r];
+      }
+    }
+  }
+}
+
+module.exports = { partOne, partTwo };
