@@ -1,8 +1,8 @@
-const fs = require('fs');
+const fs = require('fs').promises;
 const path = require('path');
 
 async function readExpenses() {
-  const input = await fs.promises.readFile(
+  const input = await fs.readFile(
     path.join(__dirname, 'inputs', 'day-1.txt'),
     'utf8'
   );
