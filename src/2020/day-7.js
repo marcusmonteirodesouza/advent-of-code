@@ -1,35 +1,6 @@
 const fs = require('fs').promises;
 const path = require('path');
-
-class DirectedGraph {
-  constructor() {
-    this._adjacencyList = {};
-  }
-
-  get vertices() {
-    return Object.keys(this._adjacencyList);
-  }
-
-  addVertex(id) {
-    if (id in this._adjacencyList) {
-      return;
-    }
-
-    this._adjacencyList[id] = {};
-  }
-
-  addEdge(v1, v2, data) {
-    this._adjacencyList[v1][v2] = data;
-  }
-
-  getEdge(v1, v2) {
-    return this._adjacencyList[v1][v2];
-  }
-
-  neighbors(vertex) {
-    return Object.keys(this._adjacencyList[vertex]);
-  }
-}
+const { DirectedGraph, bfsShortestPaths } = require('../graphs');
 
 async function readBagRulesGraph() {
   const input = await fs.readFile(
@@ -65,34 +36,6 @@ async function readBagRulesGraph() {
   return graph;
 }
 
-function bfs(graph, root, onTraversal) {
-  const queue = [root];
-
-  let currentVertex;
-
-  const enqueue = (neighbor) => {
-    if (onTraversal) {
-      onTraversal(currentVertex, neighbor);
-      queue.push(neighbor);
-    }
-  };
-  while (queue.length > 0) {
-    currentVertex = queue.shift();
-    graph.neighbors(currentVertex).forEach((vertex) => enqueue(vertex));
-  }
-}
-
-function shortestPaths(graph, root) {
-  const distance = {};
-  const previous = {};
-  distance[root] = 0;
-  bfs(graph, root, (vertex, neighbor) => {
-    distance[neighbor] = distance[vertex] + 1;
-    previous[neighbor] = vertex;
-  });
-  return { distance, previous };
-}
-
 async function partOne() {
   const graph = await readBagRulesGraph();
 
@@ -101,7 +44,7 @@ async function partOne() {
   for (const vertex of graph.vertices.filter(
     (vertex) => vertex !== shinyGold
   )) {
-    const { distance } = shortestPaths(graph, vertex);
+    const { distance } = bfsShortestPaths(graph, vertex);
     if (Number.isFinite(distance[shinyGold])) {
       result += 1;
     }
