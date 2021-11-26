@@ -59,7 +59,6 @@ async function readBagRulesGraph() {
     }
   }
 
-  await fs.writeFile('grafo.json', JSON.stringify(graph));
   return graph;
 }
 
