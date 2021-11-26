@@ -6,6 +6,10 @@ class DirectedGraph {
     this._adjacencyList = {};
   }
 
+  get vertices() {
+    return Object.keys(this._adjacencyList);
+  }
+
   addVertex(id) {
     if (id in this._adjacencyList) {
       return;
@@ -14,12 +18,12 @@ class DirectedGraph {
     this._adjacencyList[id] = {};
   }
 
-  addEdge(v1, v2, weight) {
-    this._adjacencyList[v1][v2] = weight;
+  addEdge(v1, v2, data) {
+    this._adjacencyList[v1][v2] = data;
   }
 
-  get vertices() {
-    return Object.keys(this._adjacencyList);
+  getEdge(v1, v2) {
+    return this._adjacencyList[v1][v2];
   }
 
   neighbors(vertex) {
@@ -53,7 +57,7 @@ async function readBagRulesGraph() {
           .replace(/bag\.?/, '')
           .trim();
         graph.addVertex(bagColor);
-        graph.addEdge(topLevelBagColor, bagColor, count);
+        graph.addEdge(topLevelBagColor, bagColor, { count });
       }
     }
   }
@@ -106,6 +110,20 @@ async function partOne() {
   return result;
 }
 
-async function partTwo() {}
+async function partTwo() {
+  function bagCount(graph, bag) {
+    let count = 0;
+    for (const neighbor of graph.neighbors(bag)) {
+      const neighborBagCount = graph.getEdge(bag, neighbor).count;
+      count += neighborBagCount;
+      const bagsInsideNeighbor = bagCount(graph, neighbor);
+      count += bagsInsideNeighbor * neighborBagCount;
+    }
+    return count;
+  }
+  const graph = await readBagRulesGraph();
+
+  return bagCount(graph, 'shiny gold');
+}
 
 module.exports = { partOne, partTwo };

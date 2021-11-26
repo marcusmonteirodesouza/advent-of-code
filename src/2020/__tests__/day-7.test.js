@@ -7,7 +7,9 @@ describe('day-7', () => {
     });
   });
 
-  describe.skip('partTwo', () => {
-    it('should return the correct result', async () => {});
+  describe('partTwo', () => {
+    it('should return the correct result', async () => {
+      await expect(day7.partTwo()).resolves.toBe(13264);
+    });
   });
 });
