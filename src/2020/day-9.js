@@ -41,6 +41,42 @@ async function partOne() {
   }
 }
 
-async function partTwo() {}
+async function partTwo() {
+  function findArrayThatSumsTo(k, numbers) {
+    const map = new Map();
+    const initial = [];
+    initial.push(-1);
+    map.set(0, initial);
+    let prefixSum = 0;
+
+    for (let i = 0; i < numbers.length; i++) {
+      prefixSum += numbers[i];
+      if (map.has(prefixSum - k)) {
+        const startIndexes = map.get(prefixSum - k);
+        return numbers.slice(startIndexes[0] + 1, i + 1);
+      }
+
+      let newStart = [];
+      if (map.has(prefixSum)) {
+        newStart = map.get(prefixSum);
+      }
+
+      newStart.push(i);
+      map.set(prefixSum, newStart);
+    }
+  }
+
+  const numbers = await readNumbers();
+  const invalidNumber = await partOne();
+  const arrayThatSumsToInvalidNumber = findArrayThatSumsTo(
+    invalidNumber,
+    numbers
+  );
+  arrayThatSumsToInvalidNumber.sort((a, b) => a - b);
+  return (
+    arrayThatSumsToInvalidNumber[0] +
+    arrayThatSumsToInvalidNumber[arrayThatSumsToInvalidNumber.length - 1]
+  );
+}
 
 module.exports = { partOne, partTwo };
