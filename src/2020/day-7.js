@@ -1,6 +1,5 @@
 const fs = require('fs').promises;
 const path = require('path');
-const Heap = require('heap');
 
 class DirectedGraph {
   constructor() {
@@ -23,8 +22,8 @@ class DirectedGraph {
     return Object.keys(this._adjacencyList);
   }
 
-  getNeighbors(vertexId) {
-    return Object.keys(this._adjacencyList[vertexId]);
+  neighbors(vertex) {
+    return Object.keys(this._adjacencyList[vertex]);
   }
 }
 
@@ -62,41 +61,31 @@ async function readBagRulesGraph() {
   return graph;
 }
 
-function dijkstra(graph, root) {
-  const distance = {};
-  const previous = {};
-
-  const getDist = (vertex) => distance[vertex];
-  const setDist = (vertex, d) => {
-    distance[vertex] = d;
-    heap.updateItem(vertex);
-  };
-
-  distance[root] = 0;
-  const heap = new Heap((a, b) => getDist(a) - getDist(b));
-  graph.vertices.forEach((vertex) => {
-    if (vertex !== root) {
-      distance[vertex] = Number.POSITIVE_INFINITY;
-    }
-
-    heap.push(vertex);
-  });
+function bfs(graph, root, onTraversal) {
+  const queue = [root];
 
   let currentVertex;
 
-  const relax = (vertex) => {
-    const newDistance = distance[currentVertex] + 1;
-    if (newDistance < distance[vertex]) {
-      setDist(vertex, newDistance);
-      previous[vertex] = currentVertex;
+  const enqueue = (neighbor) => {
+    if (onTraversal) {
+      onTraversal(currentVertex, neighbor);
+      queue.push(neighbor);
     }
   };
-
-  while (heap.size() > 0) {
-    currentVertex = heap.pop();
-    graph.getNeighbors(currentVertex).forEach(relax);
+  while (queue.length > 0) {
+    currentVertex = queue.shift();
+    graph.neighbors(currentVertex).forEach((vertex) => enqueue(vertex));
   }
+}
 
+function shortestPaths(graph, root) {
+  const distance = {};
+  const previous = {};
+  distance[root] = 0;
+  bfs(graph, root, (vertex, neighbor) => {
+    distance[neighbor] = distance[vertex] + 1;
+    previous[neighbor] = vertex;
+  });
   return { distance, previous };
 }
 
@@ -108,7 +97,7 @@ async function partOne() {
   for (const vertex of graph.vertices.filter(
     (vertex) => vertex !== shinyGold
   )) {
-    const { distance } = dijkstra(graph, vertex);
+    const { distance } = shortestPaths(graph, vertex);
     if (Number.isFinite(distance[shinyGold])) {
       result += 1;
     }

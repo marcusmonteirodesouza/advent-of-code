@@ -18,8 +18,5 @@
   },
   "lint-staged": {
     "*.{js,json,md}": "prettier --write"
-  },
-  "dependencies": {
-    "heap": "^0.2.6"
   }
 }
