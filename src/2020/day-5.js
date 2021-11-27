@@ -1,5 +1,6 @@
 const fs = require('fs').promises;
 const path = require('path');
+const range = require('lodash/range');
 
 async function readBoadingPasses() {
   const input = await fs.readFile(
@@ -8,10 +9,6 @@ async function readBoadingPasses() {
   );
 
   return input.trim().split('\n');
-}
-
-function range(to) {
-  return [...Array(to).keys()];
 }
 
 function getSeatId(boardingPass) {
